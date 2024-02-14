@@ -1,3 +1,3 @@
-javac -d ../class ../src/MailItem.java
+javac -d ../class ../src/mail/MailItem.java
 
 pause
