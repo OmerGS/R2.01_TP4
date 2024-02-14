@@ -1,7 +1,3 @@
-javac -d ../class ../src/Promotion.java
-
-javac -d ../class ../src/ScenarioPromotion.java
-
-java ScenarioPromotion
+javac -d ../class ../src/MailItem.java
 
 pause
