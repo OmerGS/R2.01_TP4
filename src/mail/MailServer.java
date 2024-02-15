@@ -39,7 +39,7 @@ public class MailServer {
         MailItem prochainMail = null;
 
         if(who == null){
-            System.out.println("MailServer_getNextMailItem : Valeur Nukke");
+            System.out.println("MailServer_getNextMailItem : Valeur Nulle");
         } else {
             if(howManyMailItems(who) > 0){
                 boolean found = false;
