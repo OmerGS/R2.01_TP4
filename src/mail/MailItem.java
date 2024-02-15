@@ -22,9 +22,9 @@ public class MailItem{
     /**
     * The constructor of MailItem
     *  
-    * @param from
-    * @param to
-    * @param message
+    * @param from L'envoyeur du message
+    * @param to Le destinateur
+    * @param message - Le message
     */
     public MailItem(String from, String to, String message){
         if((to != null) && (from != null) && (message != null)){

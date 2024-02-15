@@ -2,13 +2,28 @@ package mail;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+* Server of our mail services
+* @author O.Gunes 
+*/
 public class MailServer {
+    /**
+     * ArrayList which contain mails.
+     */
     private ArrayList<MailItem> items;
 
+    /**
+     * Constructor which initialize Items arraylist
+     */
     public MailServer(){
         this.items = new ArrayList<MailItem>();
     }
 
+    /**
+     * Allow to post mail at somebody
+     * 
+     * @param item - The mail
+     */
     public void post(MailItem item){
         if(items != null){
             this.items.add(item);
@@ -18,8 +33,8 @@ public class MailServer {
     }
 
     /**
-     * @param who
-     * @return
+     * @param who - The persons who wants know how mail he has
+     * @return - Number of unread mail
      */
     public int howManyMailItems(String who){
         int compteur = 0;
@@ -35,6 +50,12 @@ public class MailServer {
         return(compteur);
     }
 
+    /**
+    * A method which return you an unread mail
+    *
+    * @param who - E-mail who had received mail
+    * @return - The mail
+    */
     public MailItem getNextMailItem(String who){
         MailItem prochainMail = null;
 

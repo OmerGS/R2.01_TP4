@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"mail","l":"MailItem"},{"p":"mail","l":"MailServer"}];updateSearchResults();
