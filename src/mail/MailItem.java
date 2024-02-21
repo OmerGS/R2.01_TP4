@@ -70,6 +70,9 @@ public class MailItem{
     *       - The message
     */
     public void print(){
-        System.out.println(this.from + "\n" + this.to + "\n" + this.message);
+        System.out.println(
+            "De : " + this.from + "\n" + 
+            "A : " + this.to + "\n" + 
+            "Message : " + this.message);
     }
 }

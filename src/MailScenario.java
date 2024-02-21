@@ -1,212 +1,260 @@
-import mail.MailServer;
-import mail.MailItem;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import mail.*;
 
 public class MailScenario {
+
+    private String nomUtilisateurCourant;
+
+    private static ArrayList<MailClient> LesClients = new ArrayList<>();
+
+    ArrayList<String> motsSpam = new ArrayList<>();
+
+    MailServer server = new MailServer(motsSpam);
+
     public static void main(String[] args) {
-        // Cr\u00E9ation d'une instance de MailServer
-        MailServer server = new MailServer();
+        MailScenario mailScenario = new MailScenario();
 
-        // Sc\u00E9nario 1: Envoi d'un mail de John à Alice
-        MailItem mail1 = new MailItem("john@example.com", "alice@example.com", "Bonjour Alice, comment vas-tu \uD83D\uDE0A ?");
-        server.post(mail1);
-
-        // Sc\u00E9nario 2: Envoi d'un mail de Bob à Alice
-        MailItem mail2 = new MailItem("bob@example.com", "alice@example.com", "Salut Alice, as-tu vu le nouveau film ?");
-        server.post(mail2);
-
-        // Sc\u00E9nario 3: Envoi d'un mail de Alice à John
-        MailItem mail3 = new MailItem("alice@example.com", "john@example.com", "Bonjour John, j'ai bien reçu ton message.");
-        server.post(mail3);
-
-        // Sc\u00E9nario 4: Lecture du prochain mail pour Alice
-        System.out.println("---------------------------------------------");
-        MailItem nextMailForAlice = server.getNextMailItem("alice@example.com");
-        if (nextMailForAlice != null) {
-            System.out.println("Sc\u00E9nario 4: Prochain mail pour Alice : ");
-            nextMailForAlice.print();
-        } else {
-            System.out.println("Sc\u00E9nario 4: Aucun mail pour Alice.");
-        }
-
-        // Sc\u00E9nario 5: R\u00E9ponse à un mail de Alice à John
-        MailItem replyMail = new MailItem("alice@example.com", "john@example.com", "Merci John, je vais bien.");
-        server.post(replyMail);
-
-        // Sc\u00E9nario 6: Lecture du prochain mail pour John
-        System.out.println("---------------------------------------------");
-        MailItem nextMailForJohn = server.getNextMailItem("john@example.com");
-        if (nextMailForJohn != null) {
-            System.out.println("Sc\u00E9nario 6: Prochain mail pour John : ");
-            nextMailForJohn.print();
-        } else {
-            System.out.println("Sc\u00E9nario 6: Aucun mail pour John.");
-        }
-
-        // Sc\u00E9nario 7: V\u00E9rification du nombre total de mails
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 7: Nombre total de mails sur le serveur : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 8: Lecture de tous les mails pour Alice
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 8: Mails pour Alice : ");
-        while (server.howManyMailItems("alice@example.com") > 0) {
-            MailItem mailForAlice = server.getNextMailItem("alice@example.com");
-            mailForAlice.print();
-        }
-
-        // Sc\u00E9nario 9: V\u00E9rification du nombre de mails pour un destinataire nul
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 9: Nombre de mails pour un destinataire nul : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 10: Tentative de lecture d'un mail pour un destinataire nul
-        System.out.println("---------------------------------------------");
-        MailItem nextMailForNull = server.getNextMailItem(null);
-        if (nextMailForNull != null) {
-            System.out.println("Sc\u00E9nario 10: Prochain mail pour un destinataire nul : ");
-            nextMailForNull.print();
-        } else {
-            System.out.println("Sc\u00E9nario 10: Aucun mail pour un destinataire nul.");
-        }
-
-        // Sc\u00E9nario 11: Envoi de plusieurs mails
-        System.out.println("---------------------------------------------");
-        MailItem[] mails = {
-            new MailItem("mallory@example.com", "eve@example.com", "Eve, n'oublie pas notre rendez-vous demain."),
-            new MailItem("eve@example.com", "mallory@example.com", "D'accord Mallory, à demain."),
-            new MailItem("bob@example.com", "mallory@example.com", "Attention Alice, ne r\u00E9ponds pas à ce mail !")
-        };
-        for (MailItem mail : mails) {
-            server.post(mail);
-        }
-
-        // Sc\u00E9nario 12: Lecture de tous les mails pour Mallory
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 12: Mails pour Mallory : ");
-        while (server.howManyMailItems("mallory@example.com") > 0) {
-            MailItem mailForMallory = server.getNextMailItem("mallory@example.com");
-            mailForMallory.print();
-        }
-
-        // Sc\u00E9nario 13: V\u00E9rification du nombre total de mails apr\u00E8s lecture
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 13: Nombre total de mails sur le serveur apr\u00E8s lecture : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 14: Envoi d'un mail avec message vide
-        System.out.println("---------------------------------------------");
-        MailItem mailWithEmptyMessage = new MailItem("john@example.com", "alice@example.com", "\uD83D\uDE0A");
-        server.post(mailWithEmptyMessage);
-        System.out.println("Sc\u00E9nario 14: Mail avec message vide envoy\u00E9.");
-
-        // Sc\u00E9nario 15: Lecture du prochain mail pour Alice apr\u00E8s envoi du mail vide
-        System.out.println("---------------------------------------------");
-        nextMailForAlice = server.getNextMailItem("alice@example.com");
-        if (nextMailForAlice != null) {
-            System.out.println("Sc\u00E9nario 15: Prochain mail pour Alice apr\u00E8s envoi du mail vide : ");
-            nextMailForAlice.print();
-        } else {
-            System.out.println("Sc\u00E9nario 15: Aucun mail pour Alice apr\u00E8s envoi du mail vide.");
-        }
-
-        // Sc\u00E9nario 16: Envoi d'un mail avec destinataire vide
-        System.out.println("---------------------------------------------");
-        MailItem mailWithEmptyRecipient = new MailItem("john@example.com", "", "Test destinataire vide");
-        server.post(mailWithEmptyRecipient);
-        System.out.println("Sc\u00E9nario 16: Mail avec destinataire vide envoy\u00E9.");
-
-        // Sc\u00E9nario 17: V\u00E9rification du nombre total de mails apr\u00E8s envoi du mail avec destinataire vide
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 17: Nombre total de mails sur le serveur apr\u00E8s envoi du mail avec destinataire vide : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 18: Envoi d'un mail avec exp\u00E9diteur vide
-        System.out.println("---------------------------------------------");
-        MailItem mailWithEmptySender = new MailItem("", "alice@example.com", "Test exp\u00E9diteur vide");
-        server.post(mailWithEmptySender);
-        System.out.println("Sc\u00E9nario 18: Mail avec exp\u00E9diteur vide envoy\u00E9.");
-
-        // Sc\u00E9nario 19: V\u00E9rification du nombre total de mails apr\u00E8s envoi du mail avec exp\u00E9diteur vide
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 19: Nombre total de mails sur le serveur apr\u00E8s envoi du mail avec exp\u00E9diteur vide : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 20: Envoi d'un mail avec des caract\u00E8res sp\u00E9ciaux
-        System.out.println("---------------------------------------------");
-        MailItem mailWithSpecialChars = new MailItem("bob@example.com", "alice@example.com", "Voici un message avec des caract\u00E8res sp\u00E9ciaux : \u00E7\u00E0\u00E8\u00FC");
-        server.post(mailWithSpecialChars);
-        System.out.println("Sc\u00E9nario 20: Mail avec caract\u00E8res sp\u00E9ciaux envoy\u00E9.");
-
-        // Sc\u00E9nario 21: Lecture du prochain mail pour Alice apr\u00E8s envoi du mail avec caract\u00E8res sp\u00E9ciaux
-        System.out.println("---------------------------------------------");
-        nextMailForAlice = server.getNextMailItem("alice@example.com");
-        if (nextMailForAlice != null) {
-            System.out.println("Sc\u00E9nario 21: Prochain mail pour Alice apr\u00E8s envoi du mail avec caract\u00E8res sp\u00E9ciaux : ");
-            nextMailForAlice.print();
-        } else {
-            System.out.println("Sc\u00E9nario 21: Aucun mail pour Alice apr\u00E8s envoi du mail avec caract\u00E8res sp\u00E9ciaux.");
-        }
-
-        // Sc\u00E9nario 22: Envoi de plusieurs mails avec des messages vides
-        System.out.println("---------------------------------------------");
-        MailItem mailWithEmptyMessage1 = new MailItem("mallory@example.com", "bob@example.com", "");
-        MailItem mailWithEmptyMessage2 = new MailItem("eve@example.com", "mallory@example.com", "");
-        MailItem mailWithEmptyMessage3 = new MailItem("alice@example.com", "eve@example.com", "");
-        server.post(mailWithEmptyMessage1);
-        server.post(mailWithEmptyMessage2);
-        server.post(mailWithEmptyMessage3);
-        System.out.println("Sc\u00E9nario 22: Mails avec messages vides envoy\u00E9s.");
-
-        // Sc\u00E9nario 23: Lecture de tous les mails pour Bob
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 23: Mails pour Bob : ");
-        while (server.howManyMailItems("bob@example.com") > 0) {
-            MailItem mailForBob = server.getNextMailItem("bob@example.com");
-            mailForBob.print();
-        }
-
-        // Sc\u00E9nario 24: Lecture de tous les mails pour Eve
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 24: Mails pour Eve : ");
-        while (server.howManyMailItems("eve@example.com") > 0) {
-            MailItem mailForEve = server.getNextMailItem("eve@example.com");
-            mailForEve.print();
-        }
-
-        // Sc\u00E9nario 25: Tentative de lecture de mails pour un destinataire inexistant
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 25: Mails pour un destinataire inexistant : ");
-        while (server.howManyMailItems("inexistant@example.com") > 0) {
-            MailItem mailForInexistant = server.getNextMailItem("inexistant@example.com");
-            mailForInexistant.print();
-        }
-
-        // Sc\u00E9nario 26: Envoi d'un mail avec un message contenant uniquement des espaces
-        System.out.println("---------------------------------------------");
-        MailItem mailWithSpaces = new MailItem("john@example.com", "bob@example.com", "     ");
-        server.post(mailWithSpaces);
-        System.out.println("Sc\u00E9nario 26: Mail avec un message contenant uniquement des espaces envoy\u00E9.");
-
-        // Sc\u00E9nario 27: Lecture du prochain mail pour Bob apr\u00E8s envoi du mail avec espaces uniquement
-        System.out.println("---------------------------------------------");
-        MailItem nextMailForBob = server.getNextMailItem("bob@example.com");
-        if (nextMailForBob != null) {
-            System.out.println("Sc\u00E9nario 27: Prochain mail pour Bob apr\u00E8s envoi du mail avec espaces uniquement : ");
-            nextMailForBob.print();
-        } else {
-            System.out.println("Sc\u00E9nario 27: Aucun mail pour Bob apr\u00E8s envoi du mail avec espaces uniquement.");
-        }
-
-        // Sc\u00E9nario 28: V\u00E9rification du nombre total de mails apr\u00E8s envoi du mail avec espaces uniquement
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 28: Nombre total de mails sur le serveur apr\u00E8s envoi du mail avec espaces uniquement : " + server.howManyMailItems(null));
-
-        // Sc\u00E9nario 29: Lecture de tous les mails sur le serveur apr\u00E8s tous les sc\u00E9narios
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 29: Tous les mails sur le serveur : ");
-        while (server.howManyMailItems(null) > 0) {
-            MailItem mail = server.getNextMailItem(null);
-            mail.print();
-        }
-
-        // Sc\u00E9nario 30: V\u00E9rification du nombre total de mails sur le serveur apr\u00E8s tous les sc\u00E9narios
-        System.out.println("---------------------------------------------");
-        System.out.println("Sc\u00E9nario 30: Nombre total de mails sur le serveur apr\u00E8s tous les sc\u00E9narios : " + server.howManyMailItems(null));
+        mailScenario.start();
     }
+
+    public void start(){
+        motsSpam.add("argent");
+        motsSpam.add("riche");
+        motsSpam.add("concours");
+        motsSpam.add("gagner");
+
+        MailClient omer = new MailClient(server, "omer");
+
+        LesClients.add(omer);
+
+        connectionOuInscripion();
+    }
+
+    public void connectionOuInscripion(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("Bienvenue sur Mailer !");
+        System.out.println("Appuyer sur 'A' pour vous connecter");
+        System.out.println("Appuyer sur 'B' pour vous inscrire");
+        String userPrompt = SimpleInput.getString("");
+        if(userPrompt.equals("A")){
+            connection();
+        } else if(userPrompt.equals("B")){
+            inscription();
+        }
+    }
+
+    public void connection(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** CONNECTION SUR MAILER ***");
+        String nameOfUser;
+        do{
+            nameOfUser = SimpleInput.getString("Entrez votre identifiant : ");
+
+            if(getClientByName(nameOfUser) == true){
+                this.nomUtilisateurCourant = nameOfUser;
+                System.out.print("\033[H\033[2J");  
+                System.out.println("Connecté avec succès");
+                menuPrincipal();
+            } else {
+                System.out.println("Erreur identifiant inconnu !");
+            }
+
+        } while(getClientByName(nameOfUser) == false);
+    }
+
+    private boolean getClientByName(String nom) {
+        boolean existe = false;
+        for (MailClient client : LesClients) {
+            if (client.getUser().equals(nom)) {
+                existe = true;
+            }
+        }
+        return existe; // Retourne null si aucun client n'est trouvé avec cet identifiant
+    }
+    
+
+    public void inscription(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** INSCRIPTION SUR MAILER ***");
+        String nameOfUser;
+        boolean sorti = false;
+
+        do{
+            nameOfUser = SimpleInput.getString("Entrez votre identifiant (ne l'oubliez pas) : ");
+            
+            if(getClientByName(nameOfUser) == true){
+                System.out.println("Erreur cet identifiant existe deja");
+            } else {
+                System.out.println("Inscription realisé avec succès !");
+                MailClient client = new MailClient(server, nameOfUser);
+                LesClients.add(client);
+                System.out.print("\033[H\033[2J");
+                sorti = true;
+                connection();
+            }
+        } while(getClientByName(nameOfUser) == true && !sorti);
+    }
+
+    public void menuPrincipal(){
+        System.out.print("\033[H\033[2J");
+        int choix;
+        System.out.println(nomUtilisateurCourant + ", bienvenue sur votre compte Mailer !");
+        
+        do{
+            System.out.print("\033[H\033[2J");
+            int nbMailNonLu = server.howManyMailItems(nomUtilisateurCourant);
+            System.out.println("Vous avez " + nbMailNonLu + " mail non lu.");
+
+            System.out.println("Appuyez sur '1' pour envoyer des mails");
+            System.out.println("Appuyez sur '2' pour consultez vos mails");
+            System.out.println("Appuyez sur '3' pour consultez vos mails indesirables");
+            System.out.println("Appuyez sur '4' pour allez dans les parametres");
+            System.out.println("Appuyez sur '5' pour vous deconnectez");
+            
+            Scanner inChoix = new Scanner(System.in);
+            choix = inChoix.nextInt();
+
+            if(choix == 1){
+                mailSend();
+            } else if(choix == 2){
+                boiteDeReception();
+            } else if(choix == 3){
+                spamMail();
+            } else if(choix == 4){
+                parameters();
+            } else if(choix == 5){
+                logout();
+            } else {
+                System.out.println("Choix inconnu");
+            }
+        } while(choix < 5);
+    }
+
+    public void mailSend(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** ENVOIE DE MAIL ***");
+        MailItem mail;
+
+        System.out.println("A qui voulez-vous envoyez le mail ? : ");
+        Scanner inTo = new Scanner(System.in);
+        String to = inTo.next();
+
+        System.out.println("Destinataire : " + to);
+        
+        System.out.println("Que voulez vous envoyez ? : ");
+        Scanner inMessage = new Scanner(System.in);
+        String message = inMessage.next();
+
+        mail = new MailItem(nomUtilisateurCourant, to, message);
+
+        server.post(mail);
+
+        mail.print();
+    }
+
+    public void boiteDeReception(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** BOITES DE RECEPTION ***");
+        int nbMailNonLu = server.howManyMailItems(nomUtilisateurCourant);
+        System.out.println("Vous avez " + nbMailNonLu + " mail non lu.");
+
+        MailItem mail = server.getNextMailItem(nomUtilisateurCourant);
+
+        if(mail != null){
+            mail.print();
+        } else {
+            System.out.println("Pas de nouveau mail !");
+        }
+
+        System.out.println("Appuyez sur une touche pour sortir.");
+        Scanner inSortie = new Scanner(System.in);
+        String sortie = inSortie.next();
+    }
+
+    public void spamMail(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** COURRIER INDESIRABLES ***");
+
+        MailItem mail = server.getNextMailSpam(nomUtilisateurCourant);
+
+        if(mail != null){
+            mail.print();
+        } else {
+            System.out.println("Pas de nouveau mail !");
+        }
+
+        System.out.println("Appuyez sur une touche pour sortir.");
+        Scanner inSortie = new Scanner(System.in);
+        String sortie = inSortie.next();
+    }
+
+    public void parameters(){
+        System.out.print("\033[H\033[2J"); 
+        System.out.println("*** PARAMETRES ***");
+
+        for(String mot : motsSpam){
+            System.out.println(mot);
+        }
+
+
+        System.out.println("\nAppuyez sur F pour ajouter des mots\n Appuyez sur H supprimer des mots");
+        System.out.println("Appuyez sur une autre touche pour quitter");
+
+        Scanner inSortie = new Scanner(System.in);
+        String sortie = inSortie.next();
+
+
+        // ? FAIRE DES DO WHILE COMME CA ON EN AJOUTE PLUSIEURS D'UN COUP
+
+        if(sortie.equals("F")){
+            System.out.println("Veillez saisir un mot a ajouter (tapez 'echap' pour quitter)");
+            Scanner inAdd = new Scanner(System.in);
+            String add = inAdd.next();
+
+            if(add.equals("echap")){
+                parameters();
+            } else {
+                motsSpam.add(add);
+                parameters();
+            }
+
+        } else if(sortie.equals("H")){
+            System.out.println("Veillez saisir un mot a supprimer (tapez 'echap' pour quitter)");
+            Scanner inAdd = new Scanner(System.in);
+            String add = inAdd.next();
+            if(add.equals("echap")){
+                parameters();
+            } else {
+                motsSpam.remove(add);
+                parameters();
+            }
+        } else {
+            menuPrincipal();
+        }
+    }
+
+    public void logout(){
+        System.out.print("\033[H\033[2J"); 
+        String choix;
+    
+        System.out.println("*** PAGE DE DECONNEXION ***");
+    
+        do {
+            choix = SimpleInput.getString("Êtes-vous sûr de vous déconnecter ? (Oui/Non)");
+        } while(!choix.equalsIgnoreCase("Oui") && !choix.equalsIgnoreCase("Non"));
+    
+        if(choix.equalsIgnoreCase("Oui")){
+            System.out.println("Déconnexion...");
+            System.out.print("\033[H\033[2J");  
+            connectionOuInscripion();
+        } else if(choix.equalsIgnoreCase("Non")){
+            System.out.println("Redirection vers le menu");
+            System.out.print("\033[H\033[2J");
+            menuPrincipal(); 
+        }
+    }
+    
 }

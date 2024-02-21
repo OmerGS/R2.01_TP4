@@ -12,12 +12,26 @@ public class MailServer {
      */
     private ArrayList<MailItem> items;
 
+    private AntiSpam antiSpam;
+
+    private ArrayList<MailItem> indesirable;
+
     /**
-     * Constructor which initialize Items arraylist
-     */
-    public MailServer(){
-        this.items = new ArrayList<MailItem>();
-    }
+    * Constructor which initialize Items arraylist
+    */
+    public MailServer(ArrayList<String>a){
+        if(a != null){
+            this.antiSpam = new AntiSpam(a);
+            this.items = new ArrayList<MailItem>();
+            this.indesirable = new ArrayList<MailItem>();
+        }
+        else{
+            System.out.println("Mettre des parametre valide");
+            this.antiSpam = new AntiSpam(new ArrayList<String>());
+            this.items = new ArrayList<MailItem>();
+        }
+        
+    }    
 
     /**
      * Allow to post mail at somebody
@@ -25,10 +39,18 @@ public class MailServer {
      * @param item - The mail
      */
     public void post(MailItem item){
-        if(items != null){
-            this.items.add(item);
-        } else {
-            System.out.println("MailServer_post : Item Nulle");
+        if(item != null){
+            if(this.antiSpam.scan(item.getMessage())){
+                String s = "[SPAM] " + item.getMessage();
+                MailItem it = new MailItem(item.getFrom(), item.getTo(), s);
+                this.indesirable.add(it);
+            }
+            else{
+                this.items.add(item);
+            }
+        }
+        else{
+            System.out.println("Mettre des parametre des valide");
         }
     }
 
@@ -65,6 +87,44 @@ public class MailServer {
             if(howManyMailItems(who) > 0){
                 boolean found = false;
                 Iterator<MailItem> it = this.items.iterator();
+                while(it.hasNext() || !found){
+                    MailItem nextItem = it.next();
+                    if(nextItem.getTo().equals(who)){
+                        it.remove();
+                        found = true;
+                        prochainMail = nextItem;
+                    }
+                }
+            }
+        }
+        return(prochainMail);
+    }
+
+
+    public int howManyMailSpam(String who){
+        int compteur = 0;
+        if(who == null){
+            System.out.println("MailServer_howManyMailItems : Valeur Nulle");
+        } else {
+            for (MailItem spam : indesirable) {
+                if(((spam.getTo())).equals(who)){
+                    compteur++;
+                }
+            }
+        }
+        return(compteur);
+    }
+
+
+    public MailItem getNextMailSpam(String who){
+        MailItem prochainMail = null;
+
+        if(who == null){
+            System.out.println("MailServer_getNextMailItem : Valeur Nulle");
+        } else {
+            if(howManyMailSpam(who) > 0){
+                boolean found = false;
+                Iterator<MailItem> it = this.indesirable.iterator();
                 while(it.hasNext() || !found){
                     MailItem nextItem = it.next();
                     if(nextItem.getTo().equals(who)){
