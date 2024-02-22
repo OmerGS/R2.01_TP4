@@ -49,6 +49,7 @@ public class MailScenario {
     public void connection(){
         System.out.print("\033[H\033[2J"); 
         System.out.println("*** CONNECTION SUR MAILER ***");
+        System.out.println("Saisissez 'echap' pour revenir en arriere !");
         String nameOfUser;
         do{
             nameOfUser = SimpleInput.getString("Entrez votre identifiant : ");
@@ -58,6 +59,8 @@ public class MailScenario {
                 System.out.print("\033[H\033[2J");  
                 System.out.println("Connecté avec succès");
                 menuPrincipal();
+            } else if(nameOfUser.equals("echap")) {
+                connectionOuInscripion();
             } else {
                 System.out.println("Erreur identifiant inconnu !");
             }
@@ -200,7 +203,7 @@ public class MailScenario {
         }
 
 
-        System.out.println("\nAppuyez sur F pour ajouter des mots\n Appuyez sur H supprimer des mots");
+        System.out.println("\nAppuyez sur F pour ajouter des mots\nAppuyez sur H supprimer des mots");
         System.out.println("Appuyez sur une autre touche pour quitter");
 
         Scanner inSortie = new Scanner(System.in);
@@ -212,26 +215,32 @@ public class MailScenario {
         if(sortie.equals("F")){
             System.out.println("Veillez saisir un mot a ajouter (tapez 'echap' pour quitter)");
             Scanner inAdd = new Scanner(System.in);
-            String add = inAdd.next();
-
-            if(add.equals("echap")){
-                parameters();
-            } else {
-                motsSpam.add(add);
-                parameters();
-            }
+            String add = inAdd.next();   
+            
+            do{
+                if(add.equals("echap")){
+                    parameters();
+                } else {
+                    motsSpam.add(add);
+                    parameters();
+                }
+            } while(!(add.equals("echap")));
 
         } else if(sortie.equals("H")){
             System.out.println("Veillez saisir un mot a supprimer (tapez 'echap' pour quitter)");
             Scanner inAdd = new Scanner(System.in);
             String add = inAdd.next();
-            if(add.equals("echap")){
-                parameters();
-            } else {
-                motsSpam.remove(add);
-                parameters();
-            }
-        } else {
+            
+            do{
+                if(add.equals("echap")){
+                    parameters();
+                } else {
+                    motsSpam.remove(add);
+                    parameters();
+                }
+            }while(!(add.equals("echap")));
+        }
+         else {
             menuPrincipal();
         }
     }
